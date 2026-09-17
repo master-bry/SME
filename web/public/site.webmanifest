@@ -1,0 +1,22 @@
+{
+  "name": "Dodoma SME Management Suite",
+  "short_name": "Dodoma SME",
+  "description": "POS, inventory, accounting and customer management for Tanzanian SMEs. Bilingual EN/SW, offline-ready.",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fafaf9",
+  "theme_color": "#0c4a38",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,111 +1,212 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+/* ============================================================
+   DODOMA SME — Design System
+   Principles: WCAG 2.1 AA, inclusive, mobile-first, bilingual,
+   performance-friendly (system fonts work offline, per the
+   offline-first product requirement).
+   ============================================================ */
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@theme {
+  /* Brand — "Unyama dol: Uswahilini wa Dodoma" (Dodoma green)
+     A deep, verdant green evoking Dodoma's fertile fields.
+     All shades tuned for AA contrast. */
+  --color-brand-50: #f0fdf5;
+  --color-brand-100: #dcfce8;
+  --color-brand-200: #bbf7d3;
+  --color-brand-300: #86efb0;
+  --color-brand-400: #4ade80;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a;
+  --color-brand-700: #15803d;
+  --color-brand-800: #166534;
+  --color-brand-900: #14532d;
+  --color-brand-950: #00331c;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  /* Deep forest ink — dark surfaces & brand text (higher contrast) */
+  --color-ink-50: #f4f7f6;
+  --color-ink-100: #e3eae7;
+  --color-ink-200: #c6d5d0;
+  --color-ink-300: #9fb8b0;
+  --color-ink-400: #6f9489;
+  --color-ink-500: #4f766b;
+  --color-ink-600: #3c5e55;
+  --color-ink-700: #324c46;
+  --color-ink-800: #2a3e3a;
+  --color-ink-900: #1a2b28;
+  --color-ink-950: #0b1714;
+
+  /* Accent — savannah gold (Dodoma's sun on the granary plains) */
+  --color-gold-50: #fffbeb;
+  --color-gold-100: #fef3c7;
+  --color-gold-200: #fde68a;
+  --color-gold-300: #fcd34d;
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+  --color-gold-700: #b45309;
+  --color-gold-800: #92400e;
+  --color-gold-900: #78350f;
+  --color-gold-950: #451a03;
+
+  /* Fonts — system stack covers Latin + many scripts; loads offline */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --font-display: "Inter", "SF Pro Display", ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Fluid, inclusive type scale */
+  --text-fluid-xs: clamp(0.75rem, 0.35vw + 0.68rem, 0.8125rem);
+  --text-fluid-sm: clamp(0.8125rem, 0.4vw + 0.74rem, 0.875rem);
+  --text-fluid-base: clamp(0.9375rem, 0.5vw + 0.85rem, 1rem);
+  --text-fluid-lg: clamp(1.0625rem, 0.75vw + 0.94rem, 1.1875rem);
+  --text-fluid-xl: clamp(1.25rem, 1vw + 1.1rem, 1.5rem);
+  --text-fluid-2xl: clamp(1.5rem, 1.5vw + 1.3rem, 1.875rem);
+  --text-fluid-3xl: clamp(1.875rem, 2.5vw + 1.5rem, 2.5rem);
+  --text-fluid-4xl: clamp(2.25rem, 4vw + 1.6rem, 3.25rem);
+  --text-fluid-5xl: clamp(2.75rem, 5.5vw + 1.8rem, 4.25rem);
+
+  /* Radii */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.375rem;
+  --radius-3xl: 1.75rem;
+
+  /* Motion & depth (respect reduced-motion below) */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+/* ---------- Base ---------- */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-stone-50);
+  color: var(--color-stone-900);
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
+/* Fluid type helpers */
+.text-fluid-xs { font-size: var(--text-fluid-xs); }
+.text-fluid-sm { font-size: var(--text-fluid-sm); }
+.text-fluid-base { font-size: var(--text-fluid-base); }
+.text-fluid-lg { font-size: var(--text-fluid-lg); }
+.text-fluid-xl { font-size: var(--text-fluid-xl); }
+.text-fluid-2xl { font-size: var(--text-fluid-2xl); }
+.text-fluid-3xl { font-size: var(--text-fluid-3xl); }
+.text-fluid-4xl { font-size: var(--text-fluid-4xl); }
+.text-fluid-5xl { font-size: var(--text-fluid-5xl); }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
+.font-display { font-family: var(--font-display); }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
+/* Inclusive default focus styles — visible on any surface */
+:focus-visible {
+  outline: 3px solid var(--color-gold-500);
+  outline-offset: 2px;
   border-radius: 4px;
-  color: var(--text-h);
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Selection */
+::selection {
+  background-color: var(--color-brand-200);
+  color: var(--color-brand-950);
+}
+
+/* Reduced motion — always honour user preference */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Reusable component-level helpers ---------- */
+
+/* Card surface */
+.surface {
+  background-color: #ffffff;
+  border: 1px solid var(--color-stone-200);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 1px 2px rgb(20 45 40 / 0.04), 0 8px 24px -18px rgb(20 45 40 / 0.16);
+}
+
+.surface-inset {
+  background-color: var(--color-stone-50);
+  border: 1px solid var(--color-stone-200);
+  border-radius: var(--radius-xl);
+}
+
+/* Brand gradient text (decorative, large headings only — keep AA) */
+.text-gradient-brand {
+  background-image: linear-gradient(115deg, #065f46 0%, #0f9d58 55%, #0b7285 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Grid background texture for hero */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(11 23 20 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(11 23 20 / 0.045) 1px, transparent 1px);
+  background-size: 2.25rem 2.25rem;
+}
+
+.bg-grid-light {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+  background-size: 2.25rem 2.25rem;
+}
+
+/* Focus trap ring for dialogs */
+.dialog-backdrop {
+  background-color: rgb(11 23 20 / 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* Custom scrollbars (webkit) — subtle */
+*::-webkit-scrollbar {
+  width: 0.55rem;
+  height: 0.55rem;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-stone-300);
+  border-radius: 9999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-stone-400);
+}
+
+/* Simple fade/slide entrance (skipped under reduced-motion) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .rise-in {
+    animation: rise-in 0.5s var(--ease-smooth) both;
+  }
+  .rise-in-delay-1 { animation-delay: 0.08s; }
+  .rise-in-delay-2 { animation-delay: 0.16s; }
+  .rise-in-delay-3 { animation-delay: 0.24s; }
 }
