@@ -11,17 +11,22 @@ import {
   LogOut,
   Bell,
   LifeBuoy,
+  UserRound,
 } from "lucide-react";
+import { useApp } from "../lib/db";
 import { Logo, useI18n, type Lang } from "./uiShared";
+import { PlatformRole } from "../lib/plans";
+import { fmtUserInitials } from "../lib/utils";
 import { cn } from "../lib/utils";
 
 const nav = [
-  { to: "/app", end: true, icon: LayoutDashboard, key: "nav.dashboard" as const },
-  { to: "/app/pos", icon: ScanLine, key: "nav.pos" as const },
-  { to: "/app/inventory", icon: Boxes, key: "nav.inventory" as const },
-  { to: "/app/customers", icon: Users, key: "nav.customers" as const },
-  { to: "/app/reports", icon: BarChart3, key: "nav.reports" as const },
-  { to: "/app/settings", icon: Settings, key: "nav.settings" as const },
+  { to: "/app", end: true, icon: LayoutDashboard, key: "nav.dashboard" as const, roles: null },
+  { to: "/app/pos", icon: ScanLine, key: "nav.pos" as const, roles: null },
+  { to: "/app/inventory", icon: Boxes, key: "nav.inventory" as const, roles: [PlatformRole.Admin, PlatformRole.Manager] },
+  { to: "/app/customers", icon: Users, key: "nav.customers" as const, roles: null },
+  { to: "/app/reports", icon: BarChart3, key: "nav.reports" as const, roles: [PlatformRole.Admin, PlatformRole.Manager] },
+  { to: "/app/users", icon: UserRound, key: "nav.team" as const, roles: [PlatformRole.Admin] },
+  { to: "/app/settings", icon: Settings, key: "nav.settings" as const, roles: [PlatformRole.Admin] },
 ];
 
 function LangToggle({ compact = false }: { compact?: boolean }) {
@@ -46,7 +51,20 @@ function LangToggle({ compact = false }: { compact?: boolean }) {
 export function Layout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const sw = lang === "sw";
+  const { currentUser, currentBusiness, logout } = useApp();
+
+  const role = currentUser?.role ?? PlatformRole.Cashier;
+  const allowedNav = nav.filter((n) => !n.roles || (currentUser && n.roles.includes(role)));
+  const userName = currentUser?.name ?? "—";
+  const userRole = currentUser ? roleLabelShort(currentUser.role, sw) : "—";
+  const businessName = currentBusiness?.name ?? "Dodoma SME";
+
+  const doLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  };
 
   return (
     <div className="flex min-h-screen bg-stone-50">
@@ -86,7 +104,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Main">
-          {nav.map(({ to, end, icon: Icon, key }) => (
+          {allowedNav.map(({ to, end, icon: Icon, key }) => (
             <NavLink
               key={to}
               to={to}
@@ -117,8 +135,8 @@ export function Layout({ children }: { children: ReactNode }) {
             {t("nav.landing")}
           </Link>
           <button
-            onClick={() => navigate("/")}
-            className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-fluid-sm font-medium text-ink-300 hover:bg-white/10 hover:text-white"
+            onClick={doLogout}
+            className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-fluid-sm font-medium text-red-300 hover:bg-red-500/10 hover:text-red-200"
           >
             <LogOut className="h-5 w-5" aria-hidden="true" />
             Logout / Ondoka
@@ -139,10 +157,10 @@ export function Layout({ children }: { children: ReactNode }) {
           </button>
           <div className="flex flex-1 items-center gap-2">
             <h1 className="truncate font-display text-fluid-base font-semibold text-ink-950">
-              Mjini General Store
+              {businessName}
             </h1>
             <span className="hidden rounded-full bg-brand-100 px-2.5 py-0.5 text-fluid-xs font-semibold text-brand-900 sm:inline-flex">
-              Dodoma Centre
+              {currentBusiness?.city ?? "Dodoma SME Suite"}
             </span>
           </div>
           <button
@@ -155,28 +173,30 @@ export function Layout({ children }: { children: ReactNode }) {
           <div className="hidden sm:block">
             <LangToggle compact />
           </div>
-          <button
-            className="flex items-center gap-2.5 rounded-xl p-1 pr-2 hover:bg-stone-100"
-            aria-label="Account menu"
-          >
+          <div className="flex items-center gap-2.5 rounded-xl p-1 pr-2 hover:bg-stone-100">
             <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-brand-600 to-brand-900 font-display text-fluid-sm font-bold text-white">
-              AN
+              {fmtUserInitials(userName)}
             </span>
             <span className="hidden text-left leading-tight md:block">
-              <span className="block text-fluid-sm font-semibold text-ink-950">Amina Nyerere</span>
-              <span className="block text-fluid-xs text-stone-500">Admin</span>
+              <span className="block text-fluid-sm font-semibold text-ink-950">{userName}</span>
+              <span className="block text-fluid-xs text-stone-500">{userRole}</span>
             </span>
-          </button>
+          </div>
         </header>
 
         <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
           {children}
         </main>
-
-        {/* Skip link (sits above everything) */}
       </div>
     </div>
   );
+}
+
+function roleLabelShort(role: PlatformRole, sw: boolean) {
+  if (role === PlatformRole.Superadmin) return "Super Admin";
+  if (role === PlatformRole.Admin) return sw ? "Admin" : "Admin";
+  if (role === PlatformRole.Manager) return sw ? "Meneja" : "Manager";
+  return sw ? "Muuzaji" : "Cashier";
 }
 
 export function SkipLink() {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Landmark, Bell, Languages, ShieldCheck, Users, Save } from "lucide-react";
 import { Badge, Button, Card, CardHeader, Field, Input, Select } from "../components/ui";
 import { useI18n, type Lang } from "../lib/i18n";
+import { BUSINESS_TYPES, BusinessType } from "../lib/plans";
 
 export default function Settings() {
   const { t, lang, setLang } = useI18n();
@@ -42,12 +43,10 @@ export default function Settings() {
         <CardHeader title={sw ? "Taarifa za biashara" : "Business profile"} subtitle="Mjini General Store · Dodoma Centre" />
         <div className="grid gap-4 sm:grid-cols-2">
           <Input label={sw ? "Jina la biashara" : "Business name"} defaultValue="Mjini General Store" />
-          <Select label={sw ? "Aina ya biashara" : "Business type"} defaultValue="retail">
-            <option value="retail">Retail / Rejareja</option>
-            <option value="restaurant">Restaurant / Mkahawa</option>
-            <option value="pharmacy">Pharmacy / Duka la dawa</option>
-            <option value="salon">Salon</option>
-            <option value="clinic">Clinic / Kliniki</option>
+          <Select label={sw ? "Aina ya biashara" : "Business type"} defaultValue={BusinessType.Retail}>
+            {BUSINESS_TYPES.map((bt) => (
+              <option key={bt.id} value={bt.id}>{bt.en} / {bt.sw}</option>
+            ))}
           </Select>
           <Input label={sw ? "Mmiliki" : "Owner"} defaultValue="Amina Nyerere" />
           <Input label={sw ? "Simu" : "Phone"} defaultValue="+255 712 000 111" />

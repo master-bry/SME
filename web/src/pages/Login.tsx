@@ -1,25 +1,74 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Eye, EyeOff, Lock, Mail, Languages } from "lucide-react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { ArrowRight, Eye, EyeOff, Languages, Lock, Mail, ShieldCheck, Store, UserRound } from "lucide-react";
 import { BrandWordmark, Button, Field } from "../components/ui";
+import { useApp } from "../lib/db";
 import { useI18n } from "../lib/i18n";
+import { PlatformRole } from "../lib/plans";
+
+const DEMO = [
+  {
+    role: PlatformRole.Superadmin,
+    label: "Super Admin",
+    desc: "Dhibiti biashara & subscription / Manage businesses & subs",
+    email: "superadmin@dodoma-sme.app",
+    password: "Super@1234",
+    icon: ShieldCheck,
+  },
+  {
+    role: PlatformRole.Admin,
+    label: "Shop Admin",
+    desc: "Mjini General Store · Timu / Team",
+    email: "admin@mjini.co.tz",
+    password: "Admin@1234",
+    icon: Store,
+  },
+  {
+    role: PlatformRole.Cashier,
+    label: "Cashier",
+    desc: "POS & Masoko / Sales",
+    email: "neema@mjini.co.tz",
+    password: "Cash@1234",
+    icon: UserRound,
+  },
+];
 
 export default function Login() {
   const { lang, setLang } = useI18n();
   const sw = lang === "sw";
+  const { db, currentUser, login } = useApp();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
 
+  if (currentUser) {
+    return <Navigate to={currentUser.role === PlatformRole.Superadmin ? "/admin" : "/app"} replace />;
+  }
+
   const submit = (e: FormEvent) => {
     e.preventDefault();
+    setError("");
     if (!email || !password) {
       setError(sw ? "Jaza barua pepe na nenosiri." : "Please enter email and password.");
       return;
     }
-    navigate("/app");
+    const res = login(email, password);
+    if (!res.ok) {
+      setError(res.error ?? "Failed / Imeshindikana.");
+      return;
+    }
+    const found = db.users.find(
+      (u) => u.email.toLowerCase() === email.trim().toLowerCase(),
+    )!;
+    navigate(found.role === PlatformRole.Superadmin ? "/admin" : "/app", { replace: true });
+  };
+
+  const fill = (demoEmail: string, demoPassword: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    setError("");
   };
 
   return (
@@ -39,7 +88,7 @@ export default function Login() {
           </button>
         </div>
 
-        <div className="mx-auto mt-12 w-full max-w-md lg:mt-0">
+        <div className="mx-auto mt-10 w-full max-w-md lg:mt-0">
           <h1 className="font-display text-fluid-3xl font-bold tracking-tight text-ink-950">
             {sw ? "Karibu tena 👋" : "Welcome back 👋"}
           </h1>
@@ -88,16 +137,6 @@ export default function Login() {
               </div>
             </Field>
 
-            <div className="flex items-center justify-between text-fluid-sm">
-              <label className="flex items-center gap-2 font-medium text-ink-800">
-                <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-stone-300 text-brand-700 focus:ring-brand-500" />
-                {sw ? "Nikumbuke" : "Remember me"}
-              </label>
-              <a href="#" className="font-semibold text-brand-800 hover:underline">
-                {sw ? "Umesahau nenosiri?" : "Forgot password?"}
-              </a>
-            </div>
-
             {error && (
               <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-fluid-sm font-medium text-red-800">
                 {error}
@@ -110,11 +149,31 @@ export default function Login() {
             </Button>
           </form>
 
-          {/* Demo hint */}
-          <div className="mt-6 rounded-2xl border border-brand-100 bg-brand-50 px-4 py-3.5 text-fluid-sm text-brand-900">
-            <p className="font-semibold">
-              {sw ? "Demo:" : "Demo:"} <span className="font-normal">admin@mjini.co.tz / {sw ? "nenosiri lolote" : "any password"}</span>
+          {/* Demo quick login */}
+          <div className="mt-6 rounded-2xl border border-brand-100 bg-brand-50 px-4 py-3.5">
+            <p className="font-display text-fluid-sm font-bold text-brand-900">
+              {sw ? "Akaunti za mazoezi / Demo accounts" : "Demo accounts"}
             </p>
+            <ul className="mt-2.5 space-y-2">
+              {DEMO.map((d) => (
+                <li key={d.role}>
+                  <button
+                    type="button"
+                    onClick={() => fill(d.email, d.password)}
+                    className="flex w-full items-center gap-3 rounded-xl border border-brand-200/70 bg-white px-3.5 py-2.5 text-left transition-colors hover:border-brand-400 hover:bg-brand-50"
+                  >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-100 text-brand-800">
+                      <d.icon className="h-4.5 w-4.5" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-fluid-sm font-semibold text-ink-950">{sw ? d.label : d.label}</span>
+                      <span className="block truncate text-fluid-xs text-stone-500">{d.desc}</span>
+                    </span>
+                    <span className="truncate rounded-lg bg-stone-50 px-2 py-1 font-mono text-fluid-xs text-stone-600">{d.email}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <p className="mt-8 text-center text-fluid-sm text-stone-500">
@@ -145,7 +204,7 @@ export default function Login() {
         </div>
         <div className="relative space-y-3">
           {[
-            { t: sw ? "Mauzo ya leo / Today's sales" : "Today's sales", d: "TZS 512,000", up: "+18% vs / ikilinganishwa na wiki"},
+            { t: sw ? "Mauzo ya leo / Today's sales" : "Today's sales", d: "TZS 512,000", up: "+18% vs / ikilinganishwa na wiki" },
             { t: sw ? "Bidhaa chache / Low stock alerts" : "Low stock alerts", d: "3 bidhaa / products", up: sw ? "Agiza tena" : "Reorder now" },
             { t: sw ? "Wateja wakurudiao / Repeat customers" : "Repeat customers", d: "94 leo / today", up: "+12% mwezi / this month" },
           ].map((s) => (
